@@ -30,15 +30,16 @@ public class Client {
                 DatagramSocket datagramSocket = new DatagramSocket();
                 Scanner scanner = new Scanner(System.in);
                 jsonObject.put("ip", "127.0.0.1");
-                jsonObject.put("port", 8888);
+                jsonObject.put("port", 8889);
                 while (true){
                     String line = scanner.nextLine();
                     if(line.equals("quit")) break;
                     jsonObject.put("content", line);
                     String s = jsonObject.toJSONString();
 
+                    //int port = (int) (Math.random()*8000+6000);
 
-                    DatagramPacket datagramPacket2 = new DatagramPacket(s.getBytes(),s.getBytes().length, InetAddress.getByName("127.0.0.1"),6666);
+                    DatagramPacket datagramPacket2 = new DatagramPacket(s.getBytes(),s.getBytes().length, InetAddress.getByName("127.0.0.1"),8889);
                     System.out.println("Client send:"+line);
                     datagramSocket.send(datagramPacket2);
                 }
@@ -55,7 +56,7 @@ public class Client {
         @Override
         public void run(){
             try {
-                DatagramSocket datagramSocket = new DatagramSocket(8888);
+                DatagramSocket datagramSocket = new DatagramSocket(8889);
                 DatagramPacket datagramPacket = new DatagramPacket(new byte[1024],1024);
 
                 while (true){
