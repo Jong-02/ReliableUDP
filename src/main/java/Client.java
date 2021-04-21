@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.util.HashMap;
 import java.util.Scanner;
 
 /**
@@ -16,6 +14,7 @@ import java.util.Scanner;
  * @Version 1.0
  */
 public class Client {
+    public static int PORT = 8890;
     public static void main(String[] args) {
         new Send().start();
         new Receive().start();
@@ -24,24 +23,29 @@ public class Client {
     static class Send extends Thread{
         JSONObject jsonObject = new JSONObject();
 
+
         @Override
         public void run(){
             try {
                 DatagramSocket datagramSocket = new DatagramSocket();
                 Scanner scanner = new Scanner(System.in);
-                jsonObject.put("ip", "127.0.0.1");
-                jsonObject.put("port", 8889);
+
+                ClientSentP clientSentP = new ClientSentP();
+                ClientInfo clientInfo = new ClientInfo("127.0.0.1",PORT);
+
                 while (true){
                     String line = scanner.nextLine();
                     if(line.equals("quit")) break;
-                    jsonObject.put("content", line);
-                    String s = jsonObject.toJSONString();
 
-                    //int port = (int) (Math.random()*8000+6000);
+                    clientSentP.setContent(line);
+                    clientSentP.setClientInfo(clientInfo);
 
-                    DatagramPacket datagramPacket2 = new DatagramPacket(s.getBytes(),s.getBytes().length, InetAddress.getByName("127.0.0.1"),8889);
+                    byte[] packet = ProtoStuffUtil.serialize(clientSentP);
+
+                    DatagramPacket datagramPacket = new DatagramPacket(packet,packet.length ,InetAddress.getByName("127.0.0.1"),6666);
                     System.out.println("Client send:"+line);
-                    datagramSocket.send(datagramPacket2);
+
+                    datagramSocket.send(datagramPacket);
                 }
                 datagramSocket.close();
             } catch (IOException e) {
@@ -56,7 +60,7 @@ public class Client {
         @Override
         public void run(){
             try {
-                DatagramSocket datagramSocket = new DatagramSocket(8889);
+                DatagramSocket datagramSocket = new DatagramSocket(PORT);
                 DatagramPacket datagramPacket = new DatagramPacket(new byte[1024],1024);
 
                 while (true){
@@ -67,7 +71,6 @@ public class Client {
 
                     int port = datagramPacket.getPort();
                     System.out.println("Server:"+ip+":"+port+":"+new String(arr,0,len));
-
 
                 }
 
