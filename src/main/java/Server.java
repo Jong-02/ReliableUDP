@@ -19,7 +19,7 @@ public class Server extends Thread{
 
     // public static Logger logger = LoggerFactory.getLogger("Server.class");
 
-     String content = new String();
+    String content = new String();
 
     static HashSet<ClientInfo> clientInfoHashSetSet = new HashSet<>();
 
@@ -42,6 +42,26 @@ public class Server extends Thread{
     }
 
 
+    private void send2(AckPackage ackPackage){
+        try{
+            byte []packet = ProtoStuffUtil.serialize(ackPackage);
+
+            DatagramSocket datagramSocket = new DatagramSocket();
+            DatagramPacket datagramPacket = new DatagramPacket(packet,packet.length,InetAddress.getByName(ackPackage.getIp()),ackPackage.getPort());
+
+            datagramSocket.send(datagramPacket);
+
+        }catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void acknowledge(AckPackage ackPackage){
+        ackPackage.setAckSerialNum(ackPackage.getSerialNum()+1);
+    }
+
+
+/*
     @Override
     public void run() {
         try(DatagramSocket datagramSocket = new DatagramSocket(6666)) {
@@ -56,6 +76,32 @@ public class Server extends Thread{
                 clientInfoHashSetSet.add(clientSentP.getClientInfo());
                 for (ClientInfo clientInfo : clientInfoHashSetSet) {
                     send(content,clientInfo.getIp(),clientInfo.getPort());
+                }
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+ */
+
+    @Override
+    public void run() {
+        try(DatagramSocket datagramSocket = new DatagramSocket(6666)) {
+            DatagramPacket datagramPacket = new DatagramPacket(new byte[1024], 1024);
+            while (true) {
+                datagramSocket.receive(datagramPacket);
+
+                AckPackage ackPackage = ProtoStuffUtil.deserialize(datagramPacket.getData(),datagramPacket.getLength(),AckPackage.class);
+
+                content = ackPackage.getContent();
+                System.out.println("Client send:" + content);
+                String flag = ackPackage.getFlag();
+                if (flag.equals("seq")){
+                    acknowledge(ackPackage);
+                    ackPackage.setContent("Received Successfully");
+                    send2(ackPackage);
                 }
 
             }
