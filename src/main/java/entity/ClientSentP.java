@@ -1,8 +1,10 @@
+package entity;
+
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * @ClassName ClientSentP
+ * @ClassName entity.ClientSentP
  * @Description TODO
  * @Author illion
  * @Date 2021/4/13 21:48
@@ -23,7 +25,7 @@ public class ClientSentP {
 
     @Override
     public String toString() {
-        return "ClientSentP{" +
+        return "entity.ClientSentP{" +
                 "content='" + content + '\'' +
                 ", clientInfo=" + clientInfo +
                 '}';

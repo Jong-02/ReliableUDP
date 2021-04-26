@@ -1,10 +1,16 @@
-import com.alibaba.fastjson.JSONObject;
+import entity.Package;
+import entity.ClientInfo;
+import entity.ClientSentP;
+import enums.StatusEnum;
+import util.ProtoStuffUtil;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Timer;
 
 /**
  * @ClassName Client
@@ -28,8 +34,8 @@ public class Client {
                 DatagramSocket datagramSocket = new DatagramSocket();
                 Scanner scanner = new Scanner(System.in);
 
-                ClientSentP clientSentP = new ClientSentP();
-                ClientInfo clientInfo = new ClientInfo("127.0.0.1",PORT);
+                entity.ClientSentP clientSentP = new entity.ClientSentP();
+                entity.ClientInfo clientInfo = new entity.ClientInfo("127.0.0.1",PORT);
 
                 while (true){
                     String line = scanner.nextLine();
@@ -38,7 +44,7 @@ public class Client {
                     clientSentP.setContent(line);
                     clientSentP.setClientInfo(clientInfo);
 
-                    byte[] packet = ProtoStuffUtil.serialize(clientSentP);
+                    byte[] packet = util.ProtoStuffUtil.serialize(clientSentP);
 
                     DatagramPacket datagramPacket = new DatagramPacket(packet,packet.length ,InetAddress.getByName("127.0.0.1"),6666);
                     System.out.println("Client send:"+line);
@@ -58,16 +64,16 @@ public class Client {
                 ClientSentP clientSentP = new ClientSentP();
                 ClientInfo clientInfo = new ClientInfo("127.0.0.1",PORT);
 
-
+                Timer timer = new Timer();
 
                 while (true){
                     String line = scanner.nextLine();
                     if(line.equals("quit")) break;
                     int randomNum = (int)Math.random()*100;
-                    AckPackage ackPackage = new AckPackage(PORT,"127.0.0.1","seq",line,randomNum,0,100);
-                    ackPackage.setContent(line);
+                    Package aPackage = new Package(PORT,"127.0.0.1", StatusEnum.SEQ.getNo(),line,randomNum,0,100);
+                    aPackage.setContent(line);
 
-                    byte[] packet = ProtoStuffUtil.serialize(ackPackage);
+                    byte[] packet = ProtoStuffUtil.serialize(aPackage);
 
                     DatagramPacket datagramPacket = new DatagramPacket(packet,packet.length ,InetAddress.getByName("127.0.0.1"),6666);
                     System.out.println("Client send:"+line);
@@ -96,10 +102,10 @@ public class Client {
                     datagramSocket.receive(datagramPacket);
                     byte[] arr = datagramPacket.getData();
 
-                    AckPackage ackPackage = ProtoStuffUtil.deserialize(arr,datagramPacket.getLength(),AckPackage.class);
+                    Package aPackage = ProtoStuffUtil.deserialize(arr,datagramPacket.getLength(), Package.class);
 
-                    int serial = ackPackage.getSerialNum();
-                    int ack = ackPackage.getAckSerialNum();
+                    int serial = aPackage.getSerialNum();
+                    int ack = aPackage.getAckSerialNum();
 
                     if(ack == serial+1){
                         System.out.println("Send Successfully");

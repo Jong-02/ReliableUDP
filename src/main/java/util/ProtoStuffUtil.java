@@ -1,3 +1,7 @@
+package util;
+
+import entity.ClientInfo;
+import entity.ClientSentP;
 import io.protostuff.LinkedBuffer;
 import io.protostuff.ProtostuffIOUtil;
 import io.protostuff.Schema;
@@ -6,7 +10,7 @@ import io.protostuff.runtime.RuntimeSchema;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 /**
- * @ClassName ProtoStuffUtil
+ * @ClassName util.ProtoStuffUtil
  * @Description TODO
  *  @description protostuff序列化
  *  * 并将schema对象缓存起来
@@ -21,7 +25,7 @@ public class ProtoStuffUtil {
         byte[] test = serialize(clientSentP);
         System.out.println(test);
 
-        ClientSentP c = deserialize(test,ClientSentP.class);
+        ClientSentP c = deserialize(test, ClientSentP.class);
         System.out.println(c.toString());
     }
 

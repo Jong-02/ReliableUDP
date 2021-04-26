@@ -1,10 +1,12 @@
+package entity;
+
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Objects;
 
 /**
- * @ClassName ClientInfo
+ * @ClassName entity.ClientInfo
  * @Description TODO
  * @Author illion
  * @Date 2021/4/13 20:24
@@ -49,7 +51,7 @@ public class ClientInfo {
 
     @Override
     public String toString() {
-        return "ClientInfo{" +
+        return "entity.ClientInfo{" +
                 "ip='" + ip + '\'' +
                 ", port=" + port +
                 '}';
